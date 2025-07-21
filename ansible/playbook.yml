@@ -2,8 +2,6 @@
 - name: Setup Pangolin on OCI VM
   hosts: pangolin
   become: true
-  vars_files:
-    - config.yml
   roles:
     - common
     - docker
