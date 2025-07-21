@@ -1,0 +1,44 @@
+# Ansible
+*.retry
+*.pyc
+__pycache__/
+
+# Configuration files with sensitive data
+!generate-secret.sh
+!group_vars/all/main.yml
+
+# SSH keys
+*.pem
+*.key
+id_rsa*
+id_ed25519*
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Backup files
+*.bak
+*.backup 
+inventory/hosts.ini
+ansible/inventory/hosts.ini
+ansible/inventory/hosts.ini

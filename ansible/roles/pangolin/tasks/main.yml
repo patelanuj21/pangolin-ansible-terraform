@@ -1,0 +1,102 @@
+- name: Ensure Pangolin directory exists
+  file:
+    path: /home/ubuntu/pangolin
+    state: directory
+
+- name: Ensure Pangolin config directory exists
+  file:
+    path: /home/ubuntu/pangolin/pangolin_config
+    state: directory
+
+- name: Template Pangolin config file
+  template:
+    src: pangolin_config.yml.j2
+    dest: /home/ubuntu/pangolin/pangolin_config/config.yaml
+
+- name: Ensure Traefik config directory exists
+  file:
+    path: /home/ubuntu/pangolin/config/traefik
+    state: directory
+
+- name: Template Traefik config file
+  template:
+    src: traefik_config.yml.j2
+    dest: /home/ubuntu/pangolin/config/traefik/traefik_config.yml
+
+- name: Template Traefik dynamic config file
+  template:
+    src: dynamic_config.yml.j2
+    dest: /home/ubuntu/pangolin/config/traefik/dynamic_config.yml
+
+- name: Template docker-compose.yml for Pangolin
+  template:
+    src: docker-compose.yml.j2
+    dest: /home/ubuntu/pangolin/docker-compose.yml
+  register: pangolin_compose_template
+
+- name: Check if Pangolin container is running
+  shell: docker ps --filter "name=pangolin" --filter "status=running" --format "{{'{{.Names}}'}}"
+  register: pangolin_running
+  changed_when: false
+
+- name: Check if Traefik container is running
+  shell: docker ps --filter "name=traefik" --filter "status=running" --format "{{'{{.Names}}'}}"
+  register: traefik_running
+  changed_when: false
+
+- name: Check if Gerbil container is running
+  shell: docker ps --filter "name=gerbil" --filter "status=running" --format "{{'{{.Names}}'}}"
+  register: gerbil_running
+  changed_when: false
+
+- name: Set fact if compose up is needed
+  set_fact:
+    pangolin_compose_needs_up: "{{ pangolin_compose_template.changed or (pangolin_running.stdout != 'pangolin') or (traefik_running.stdout != 'traefik') or (gerbil_running.stdout != 'gerbil') }}"
+
+- name: Remove conflicting Pangolin containers if present
+  shell: |
+    docker rm -f pangolin || true
+    docker rm -f traefik || true
+    docker rm -f gerbil || true
+  when: pangolin_compose_needs_up
+  ignore_errors: true
+
+- name: Start Pangolin and Gerbil with Docker Compose (force recreate if needed)
+  shell: |
+    cd /home/ubuntu/pangolin
+    docker compose up -d --force-recreate
+  when: pangolin_compose_needs_up
+  register: docker_compose_up
+  failed_when: docker_compose_up.rc != 0
+
+- name: Check Docker Compose service status
+  shell: |
+    cd /home/ubuntu/pangolin
+    docker compose ps
+  register: docker_compose_status
+
+- name: Display Docker Compose service status
+  debug:
+    msg: "{{ docker_compose_status.stdout_lines }}"
+
+- name: "Assert that mandatory variables are defined and not default"
+  assert:
+    that:
+      - pangolin_dashboard_url != 'https://pangolin.example.com'
+      - pangolin_base_domain != 'example.com'
+      - pangolin_secret != 'changeme'
+      - pangolin_admin_email != 'admin@example.com'
+    fail_msg: "Please define all mandatory variables in group_vars/all/main.yml. Do not use the default example values."
+    success_msg: "All mandatory variables are properly defined."
+
+- name: Display success message
+  debug:
+    msg: |
+      ✅ Pangolin deployment is complete!
+      
+      You can access your dashboard at: {{ pangolin_dashboard_url }}
+      Initial Setup URL: {{ pangolin_dashboard_url }}/auth/initial-setup
+      Admin User: {{ pangolin_admin_email }}
+
+
+

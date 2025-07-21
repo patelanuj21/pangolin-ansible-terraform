@@ -1,0 +1,47 @@
+---
+# Default values for the Pangolin Ansible role.
+# These can be overridden by the user in group_vars/all/main.yml.
+
+# Mandatory variables that must be defined by the user have a default here
+# to prevent "undefined variable" errors during playbook parsing.
+pangolin_dashboard_url: "https://pangolin.example.com"
+pangolin_base_domain: "example.com"
+pangolin_secret: "changeme"
+pangolin_admin_email: "admin@example.com"
+
+# Derived Variables
+pangolin_cors_origin: "{{ pangolin_dashboard_url }}"
+
+# Logging
+pangolin_log_level: "info"
+
+# CORS
+pangolin_cors_credentials: false
+
+# Cert Resolver for Pangolin config
+pangolin_cert_resolver: "letsencrypt"
+
+# Gerbil (WireGuard) settings
+pangolin_gerbil_start_port: 51820
+pangolin_gerbil_use_subdomain: false
+pangolin_gerbil_block_size: 24
+pangolin_gerbil_site_block_size: 30
+pangolin_gerbil_subnet_group: "100.89.137.0/20"
+
+# Rate limits
+pangolin_rate_limit_window_minutes: 1
+pangolin_rate_limit_max_requests: 500
+
+# Email (SMTP) settings
+pangolin_email_smtp_host: "smtp.example.com"
+pangolin_email_smtp_port: 587
+pangolin_email_smtp_user: "user@example.com"
+pangolin_email_smtp_pass: "changeme-email-password"
+pangolin_email_no_reply: "no-reply@example.com"
+
+# Feature flags
+pangolin_flag_require_email_verification: false
+pangolin_flag_disable_signup_without_invite: false
+pangolin_flag_disable_user_create_org: false
+pangolin_flag_allow_raw_resources: true
+pangolin_flag_allow_base_domain_resources: true

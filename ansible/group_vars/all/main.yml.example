@@ -1,0 +1,15 @@
+# Pangolin Ansible Role Global Variables
+# Copy this file to main.yml and fill in your values.
+
+# =============================================================================
+# MANDATORY: You must set these for every deployment
+# =============================================================================
+pangolin_dashboard_url: "https://pangolin.example.com"  # The full URL for your Pangolin dashboard
+pangolin_base_domain: "example.com"                     # Root/base domain
+pangolin_secret: "changeme-super-secret-key"            # Secret key for sessions
+pangolin_admin_email: "admin@example.com"               # Admin email for initial setup and Let's Encrypt
+
+# =============================================================================
+# OPTIONAL: Advanced settings can be found and overridden from
+# roles/pangolin/defaults/main.yml
+# ============================================================================= 

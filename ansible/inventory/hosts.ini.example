@@ -1,0 +1,7 @@
+# This is an example inventory file.
+# Copy this file to hosts.ini and replace the placeholders
+# with your actual server details.
+
+[pangolin]
+# Use a friendly name for your server and specify its IP with 'ansible_host'.
+pangolin-prod ansible_host=<IPv4 Addrress> ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/ssh-key.key

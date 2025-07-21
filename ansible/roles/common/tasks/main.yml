@@ -1,0 +1,50 @@
+---
+- name: Update all packages
+  apt:
+    update_cache: yes
+    upgrade: dist
+
+- name: Install essential packages
+  apt:
+    name:
+      - net-tools
+      - curl
+      - wget
+      - htop
+      - vim
+    state: present
+
+- name: Add 1GB swap file
+  shell: |
+    fallocate -l 1G /swapfile
+    chmod 600 /swapfile
+    mkswap /swapfile
+    swapon /swapfile
+  args:
+    creates: /swapfile
+
+- name: Make swap persistent
+  lineinfile:
+    dest: /etc/fstab
+    line: '/swapfile none swap sw 0 0'
+    state: present
+
+- name: Configure iptables firewall rules
+  iptables:
+    chain: INPUT
+    protocol: "{{ item.protocol }}"
+    destination_port: "{{ item.port }}"
+    jump: ACCEPT
+    action: insert
+    rule_num: 1
+  loop:
+    - { protocol: tcp, port: '80', description: 'HTTP for Lets Encrypt ACME challenge' }
+    - { protocol: tcp, port: '443', description: 'HTTPS for secure web traffic' }
+    - { protocol: udp, port: '51820', description: 'WireGuard VPN traffic' }
+  become: true
+  register: iptables_result
+
+- name: Display iptables configuration status
+  debug:
+    msg: "Configured firewall rules for ports: 80 (HTTP), 443 (HTTPS), 51820 (WireGuard UDP)"
+  when: iptables_result is changed
