@@ -7,9 +7,13 @@ It follows Ansible best practices, separating configuration from logic, to make 
 ## Prerequisites
 
 - Ansible 2.10+ installed on your local machine.
-- A target server running a recent version of Ubuntu or Debian.
+- A target server running **Ubuntu 22.04 LTS (Jammy Jellyfish)**. Other Debian-based distributions may work but are not officially tested.
 - SSH access to the target server (preferably with key-based authentication).
-- A domain name (e.g., `example.com`) and a subdomain (e.g., `pangolin.example.com`) pointing to your server's IP address.
+- **DNS A Record:** A registered domain name, with the subdomain you plan to use (e.g., `pangolin.example.com`) configured with a DNS `A` record pointing to your server's public IP address.
+- **Cloud Firewall / Security Group Rules:** You must configure your cloud provider's firewall to allow incoming traffic on the following ports:
+  - **TCP/80:** For Let's Encrypt HTTP-01 challenge.
+  - **TCP/443:** For HTTPS web access to the Pangolin dashboard.
+  - **UDP/51820:** For WireGuard (Gerbil/Newt Tunnel) traffic.
 
 ## Quick Start
 
